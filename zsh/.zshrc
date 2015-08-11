@@ -1,7 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
 stty -ixon
-
+TERM='xterm-256color'
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
@@ -21,22 +21,25 @@ alias please='sudo $(history -p !!)'
 alias c='clear'
 alias hosts='sudo $EDITOR /etc/hosts'
 alias misql='mysql -u root -ptoor'
+alias xssh='ssh -XC -c blowfish-cbc,arcfour'
+alias clip='xclip -sel clip'
+alias ipaddr="/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}' | grep -Eo \"([0-9]+\.?)+\""
+
 function addhost {
-	sudo -- sh -c "echo 127.0.0.1 $1 >> /etc/hosts"
-	mkdir $HOME/WWW/$1
+	mkdir $HOME/Web/$1
 }
 
 function fdesk {
 	find  /usr/share/applications/ /usr/local/share/applications ~/.local/share/applications/ -name "*$1*.desktop"
 }
 
-function createSVNPatch {
-	if [ $# -eq 0 ] 
-	  then
-	    echo "No arguments supplied"
-	    exit
+function forcemv()
+{
+	for last; do true; done
+	if [[ ! -e $last ]]; then
+		mkdir -p $last
 	fi
-	svn log -v -r$1 | awk '/\//{print $2}' | sed ""s/$(svn info | grep "Relative" | grep --only-matching -E "/.*" | cut -c 1- | sed -e 's/\//\\\//g')//g"" | cut -c 2- | while read x ; do  mkdir -p /tmp/$1/$(echo $x | rev | cut  -d'/' -f2- | rev);  svn cat -r32804 $x > /tmp/$1/$x  ; done && cd /tmp/$1 && zip ~/$1.zip * && cd -
+	mv $@
 }
 
 
@@ -52,7 +55,7 @@ function goto {
 }
 
 function murl {
-	curl $@ > /tmp/tmp.html && google-chrome /tmp/tmp.html && rm /tmp/tmp.html
+	curl $@ > /tmp/tmp.html && google-chrome /tmp/tmp.html  
 }
 
 function mh {
@@ -75,7 +78,7 @@ function mh {
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to disable command auto-correction.
-# DISABLE_CORRECTION="true"
+DISABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
 # COMPLETION_WAITING_DOTS="true"
@@ -122,13 +125,4 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/g
 # export SSH_KEY_PATH="~/.ssh/dsa_id"
 #
 PATH=$PATH:$HOME/bin:$HOME/.config/contrexx/bin
-export CURRENT_BRANCH=contrexx_3_2
-export GOPATH=/home/robin/gocode
-function pls {
-	sudo $(history | tail -n 1 | cut -d' ' -f5-)
-}
-source /home/robin/.phpbrew/bashrc
 
-insert_sudo () { zle beginning-of-line; zle -U "sudo " }
-zle -N insert-sudo insert_sudo
-bindkey "^[s" insert-sudo
